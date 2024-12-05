@@ -4,6 +4,7 @@ Tic Tac Toe Player
 
 import math
 import copy
+import copy
 
 X = "X"
 O = "O"
@@ -14,6 +15,7 @@ def initial_state():
     """
     Returns starting state of the board.
     """
+    return [[EMPTY, EMPTY, EMPTY], [EMPTY, EMPTY, EMPTY], [EMPTY, EMPTY, EMPTY]]
     return [[EMPTY, EMPTY, EMPTY], [EMPTY, EMPTY, EMPTY], [EMPTY, EMPTY, EMPTY]]
 
 
@@ -32,12 +34,34 @@ def player(board):
         return X
     else:
         return O
+    countX = 0
+    countO = 0
+
+    for row in board:
+        countX += row.count(X)
+        countO += row.count(O)
+
+    if countX == countO:
+        return X
+    else:
+        return O
 
 
 def actions(board):
     """
     Returns set of all possible actions (i, j) available on the board.
     """
+    actions = set()
+    i = 0
+    for row in board:
+        j = 0
+        for cell in row:
+            if cell == EMPTY:
+                actions.add((i, j))
+            j += 1
+        i += 1
+
+    return actions
     actions = set()
     i = 0
     for row in board:
@@ -129,6 +153,19 @@ def utility(board):
     """
     Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
     """
+    # Check winner of game
+    winner_player = winner(board=board)
+
+    # Return corresponding utility value
+    if winner_player == X:
+        return 1
+    elif winner_player == O:
+        return -1
+    else:
+        return 0
+
+
+# TODO: Implement
     # Check winner of game
     winner_player = winner(board=board)
 
