@@ -164,8 +164,6 @@ def utility(board):
     else:
         return 0
 
-
-# TODO: Implement
     # Check winner of game
     winner_player = winner(board=board)
 
@@ -178,7 +176,6 @@ def utility(board):
         return 0
 
 
-# TODO: Implement
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
