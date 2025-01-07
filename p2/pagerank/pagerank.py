@@ -11,14 +11,6 @@ def main():
     if len(sys.argv) != 2:
         sys.exit("Usage: python pagerank.py corpus")
     corpus = crawl(sys.argv[1])
-
-    # corpus = {
-    #     "1.html": {"2.html", "3.html"},
-    #     "2.html": {"3.html"},
-    #     "3.html": {"2.html"}
-    # }
-    # transition_model(corpus, "1.html", DAMPING)
-
     ranks = sample_pagerank(corpus, DAMPING, SAMPLES)
     print(f"PageRank Results from Sampling (n = {SAMPLES})")
     for page in sorted(ranks):
@@ -84,11 +76,6 @@ def transition_model(corpus, page, damping_factor):
             for link in links:
                 prob_dist[link] += temp_damping
 
-    # print("Transition Model")
-    # for key, value in prob_dist.items():
-    #     print(f"key: {key}")
-    #     print(f"value: {value} \n")
-
     return prob_dist
 
 
@@ -134,29 +121,38 @@ def iterate_pagerank(corpus, damping_factor):
     PageRank values should sum to 1.
     """
     n = len(corpus)
-    page_rank = {page: 1 / n for page in corpus}
-    alpha = (1 - damping_factor) / n
 
+    # Initialize PageRank values
+    page_rank = {page: 1 / n for page in corpus}
+    # Handle if page links to empty set
     corpus = {
         page: links if links else set(corpus.keys()) for page, links in corpus.items()
     }
 
+    alpha = (1 - damping_factor) / n
     while True:
+
         temp_rank = {}
-        for page, page_links in corpus.items():
+        for page in corpus:
+            # Summing contributions from all pages that link to page
             links_sum = 0
-            for link in page_links:
-                links_sum += page_rank[link] / len(corpus[link])
+            for potential_linker, links in corpus.items():
+                if page in links:
+                    contribution = page_rank[potential_linker] / len(links)
+                    links_sum += contribution
+
+            # Calculate the new rank for `page`
             temp_rank[page] = alpha + (damping_factor * links_sum)
 
-        if all(abs(temp_rank[page] - page_rank[page]) < 0.001 for page in page_rank):
+        # Check for convergence
+        differences = {
+            page: abs(temp_rank[page] - page_rank[page]) for page in page_rank
+        }
+
+        if all(diff < 0.001 for diff in differences.values()):
             break
 
         page_rank = temp_rank
-
-    total_rank = sum(page_rank.values())
-    for page in page_rank:
-        page_rank[page] /= total_rank
 
     return page_rank
 
